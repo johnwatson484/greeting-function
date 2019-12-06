@@ -74,3 +74,11 @@ stages:
               appType: functionApp
               appName: $(functionAppName)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+
+          - task: AzureFunctionApp@1
+            inputs:
+              azureSubscription: 'Visual Studio Enterprise (7a237616-4441-4449-a16a-38de645918eb)-4924'
+              appType: 'functionAppLinux'
+              appName: 'GreetingFunction'
+              package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+              runtimeStack: 'microsoft/azure-functions-dotnet-core2.0:2.0'
