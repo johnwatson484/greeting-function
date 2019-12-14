@@ -30,6 +30,13 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - task: SonarQubePrepare@4
+      inputs:
+        SonarQube: 'SonarQube'
+        scannerMode: 'MSBuild'
+        projectKey: 'greeting-function'
+        projectName: 'greeting-function'    
+
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
@@ -37,6 +44,12 @@ stages:
         projects: |
           $(workingDirectory)/*.csproj
         arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
+
+    - task: SonarQubeAnalyze@4
+
+    - task: SonarQubePublish@4
+      inputs:
+        pollingTimeoutSec: '300'
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
@@ -67,10 +80,11 @@ stages:
         deploy:
 
           steps:
+
           - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
             inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: functionApp
-              appName: $(functionAppName)
+              azureSubscription: 'Visual Studio Enterprise (7a237616-4441-4449-a16a-38de645918eb)-4924'
+              appType: 'functionAppLinux'
+              appName: 'GreetingFunction'
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              runtimeStack: 'DOCKER|microsoft/azure-functions-dotnet-core2.0:2.0'
