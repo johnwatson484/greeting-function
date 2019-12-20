@@ -35,7 +35,8 @@ stages:
         SonarQube: 'SonarQube'
         scannerMode: 'MSBuild'
         projectKey: 'greeting-function'
-        projectName: 'greeting-function'    
+        projectName: 'greeting-function' 
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))   
 
     - task: DotNetCoreCLI@2
       displayName: Build
@@ -46,10 +47,12 @@ stages:
         arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
 
     - task: SonarQubeAnalyze@4
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
     - task: SonarQubePublish@4
       inputs:
         pollingTimeoutSec: '300'
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
